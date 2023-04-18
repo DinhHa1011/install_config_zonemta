@@ -6,6 +6,14 @@
 - Ngoài ra server còn có nhiều tính năng phổ biến hơn phần mềm thương mại, như viết lại message, khởi động IP hoặc HTTP API cho post message
 - ZoneMTA có thể so sánh với Haraka nhưng không như Haraka, nó chỉ dành cho outbound. Cả hệ thống chạy trên Node.js và có một hệ thống plugin tích hợp mặc dù các thiết kế có phần khác nhau. Hệ thống plugin (và nhiều hơn nữa là tốt) cho ZoneMTA thì kế thừa từ dự án Nodemailer và do đó không có quan hệ trực tiếp với Haraka
 - Ngoài ra còn có giao diện quản trị dựa trên web (cần được cài đặt riêng)
+### ZoneMTA là gì?
+- ZoneMTA là một tác nhân chuyển thư dựa trên Nodejs và MongoDB mã ngùôn mở cung cấp cho bạn các tính năng MTA (tác nhân chuyển thư) cấp doanh nghiệp để gửi email hàng loạt
+- Nó cung cấp một loạt các tính năng và chức năng khiến MTA mã nguồn mở vượt trội so với phần mềm MTA mã nguồn mở khác như postfix, iredmail, exim,...
+#### Các tính năng quan trọng của ZoneMTA
+- Xử lý nhanh: ZoneMTA chạy trên nền tảng server nhanh nhất Nodejs và sử dụng cơ sở dữ liệu NoSQL MongoDB, nó có thể gửi hàng triệu email trong một ngày
+- Xoay vòng nhiều IP: ZoneMTA cung cấp cho bạn nhiều tính năng xoay vòng IP, đây là một trong những tính năng chính trong MTA thương mail như mailerq, greenarrow và powermta,... bạn có thể một hoặc nhiều IP để gửi email từ các IP khác nhau theo đợt
+- IP Warmup: ZoneMTA cung cấp cho bạn tính năng để kiểm soát danh tiếng của IP của bạn, bạn có thể chỉ định khối lượng email khác nhau được hiển thị thông qua IP gửi khác nhau
+- DKIM Support: DomainKeys Identified Mail là một trong những giao thức xác thực được sử dụng trong khi gửi email hàng loạt và zoneMTA cung cấp cho bạn thêm chữ ký dkim trong sending domain của bạn
 ### Upgrade notes
 - ZoneMTA version 1.1 sử dụng một ứng dụng khác cơ chế config 1.0
 - Ngoài ra, không còn ứng dụng dòng lệnh nào nữa, bạn cần bao gồm nó như một module
