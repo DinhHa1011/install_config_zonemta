@@ -50,6 +50,8 @@ mongo --eval 'db.runCommand({ connectionStatus: 1 })'         # xác minh cơ s�
 ##### tạo use/password
 ###### tạo một user admin
 mongo
+
+```
 use admin
 db.createUser({
         user: "admin",
@@ -67,7 +69,7 @@ db.createUser({
 
 use zone-mta
 db.updateUser("zonemta", {roles: [{ role : "userAdmin", db : "zone-mta" }, {role: "readWrite", db: "zone-mta"}]})
-
+```
 exit
 
 mongo 45.124.93.82 -u zonemta  -p emJQ5bQqAw9SrV5r9cKQzTjd --authenticationDatabase zone-mta
