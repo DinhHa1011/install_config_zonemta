@@ -53,20 +53,22 @@ mongo
 use admin
 db.createUser({
         user: "admin",
-        pwd:  "xTK9a37fqDVvDXY8sCTbwqQ8",
+        pwd: "xTK9a37fqDVvDXY8sCTbwqQ8",
         roles: [{role: "userAdminAnyDatabase" , db: "admin"}]
 });
 
 use zone-mta
 db.createUser({
         user: "zonemta",
-        pwd:  "emJQ5bQqAw9SrV5r9cKQzTjd",
+        pwd: "emJQ5bQqAw9SrV5r9cKQzTjd",
         roles: [{role: "userAdmin" , db: "zone-mta"},
                 { role: "readWrite", db: "test" }]
 });
+
 use zone-mta
 db.updateUser("zonemta", {roles: [{ role : "userAdmin", db : "zone-mta" }, {role: "readWrite", db: "zone-mta"}]})
-exit.
+
+exit
 
 mongo 45.124.93.82 -u zonemta  -p emJQ5bQqAw9SrV5r9cKQzTjd --authenticationDatabase zone-mta
 #### Redis
