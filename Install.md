@@ -66,7 +66,7 @@ db.createUser({
 });
 use zone-mta
 db.updateUser("zonemta", {roles: [{ role : "userAdmin", db : "zone-mta" }, {role: "readWrite", db: "zone-mta"}]})
-exit
+exit.
 
 mongo 45.124.93.82 -u zonemta  -p emJQ5bQqAw9SrV5r9cKQzTjd --authenticationDatabase zone-mta
 #### Redis
