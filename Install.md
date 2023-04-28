@@ -193,3 +193,67 @@ connections=10
 pool="stg-vccorp"
 senderDomains=["b2corp.click", "pikab.in","toandungmedia.vn","dinhha.online"]
 ```
+
+## Config postfix send email test to zonemta
+- Mặc định zonemta chỉ hỗ trợ basic auth dạng username:password (không hỗ trợ username@domain:password)
+- Cấu hình postfix relay email sang zonemta (sasl auth)
+### Config trên postfix server
+- Cài đặt postfix
+
+```
+sudo apt-get update -y
+sudo apt install mailutils -y
+```
+- Sửa file config `main.cf`
+
+```
+#transport_maps = hash:/etc/postfix/transport
+sender_dependent_default_transport_maps =  hash:/etc/postfix/transport
+
+smtp_sasl_auth_enable = yes
+smtp_sasl_security_options = noanonymous
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+mailbox_size_limit = 0
+recipient_delimiter = +
+inet_interfaces = loopback-only
+mydestination = $myhostname, localhost.$mydomain, $mydomain
+```
+
+- reload postfix config
+
+```
+postfix reload
+```
+- relay tất cả các mail có from là trangnth1@toandungmedia.vn sang zonemta server 45.124.93.82:25 => sửa file `/etc/postfix/transport`
+
+```
+trangnth1@toandungmedia.vn smtp:45.124.93.82:25
+hadt@pikab.in smtp:45.124.93.82:25
+hadinhthi@vccorp.vn smtp:45.124.93.82:25
+ah@dinhha.online smtp:45.124.93.82:25
+```
+- apply config
+
+```
+postmap /etc/postfix/transport
+```
+- Sửa file `/etc/postfix/sasl_password` chứa ip:port, user:pass dùng để login vào zonemta
+
+```
+45.124.93.82:25 trangnth:HaNoi2021
+```
+- apply config 
+
+```
+postmap /etc/postfix/sasl_passwd
+```
+- Gửi thử một email (form trùng với tên email đã được cấu hình trong file transport thì mới relay được)
+
+```
+echo "This is the body of the email" | mail  -a "From: trangnth1@toandungmedia.vn"  -s "This is the subject line"  hadt@pikab.in
+```
+- Check log postfix trong /var/log/mail.log
+- email đã được relay sang zonemta `relay=45.124.93.82[45.124.93.82]:25` có `status=sent` là thành công
+- Check log zonemta `journalctl -fu zonemta`
+
+
