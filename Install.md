@@ -47,6 +47,28 @@ mongo --eval 'db.runCommand({ connectionStatus: 1 })'         # xác minh cơ s�
 ```
 ![](https://i.imgur.com/0nVkvfn.png)
 
+##### tạo use/password
+###### tạo một user admin
+mongo
+use admin
+db.createUser({
+        user: "admin",
+        pwd:  "xTK9a37fqDVvDXY8sCTbwqQ8",
+        roles: [{role: "userAdminAnyDatabase" , db: "admin"}]
+});
+
+use zone-mta
+db.createUser({
+        user: "zonemta",
+        pwd:  "emJQ5bQqAw9SrV5r9cKQzTjd",
+        roles: [{role: "userAdmin" , db: "zone-mta"},
+                { role: "readWrite", db: "test" }]
+});
+use zone-mta
+db.updateUser("zonemta", {roles: [{ role : "userAdmin", db : "zone-mta" }, {role: "readWrite", db: "zone-mta"}]})
+exit
+
+mongo 45.124.93.82 -u zonemta  -p emJQ5bQqAw9SrV5r9cKQzTjd --authenticationDatabase zone-mta
 #### Redis
 - install redis
 ```
@@ -78,4 +100,92 @@ npm install eslint --save-dev
 npm init
 npm install --production
 npm start
+npm run config
+```
+### Config and run as a service
+
+Tạo file `/etc/systemctl/system/zonemta.service`
+
+```
+[Unit]
+Description=Zone Mail Transport Agent
+Conflicts=sendmail.service exim.service postfix.service
+After=mongod.service redis.service
+
+[Service]
+Environment="NODE_ENV=production"
+WorkingDirectory=/opt/zone-mta-template/
+ExecStart=/usr/bin/node --max-old-space-size=2048 index.js --config="config/zonemta.toml"
+ExecReload=/bin/kill -HUP $MAINPID
+Type=simple
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+- Start service
+
+```
+systemctl restart zonemta
+```
+- file `config/interfaces/feeder.toml`, interface và port listen cho smtp, tắt starttls, enable authentication
+
+```
+[feeder]
+enabled=true
+processes=10
+maxSize=20971520
+host="0.0.0.0"
+port=25
+authentication=true
+maxRecipients=1000
+starttls=false
+secure=false
+```
+- Cấu hình authen cho mỗi lần relay mail đến, thêm user/password vào file `config/zonemta.toml`
+
+```
+name="BizflyCloudZone"
+ident="zone-mta"
+
+[api]
+port=12080
+host="0.0.0.0"
+user="trangnth"
+pass="HaNoi2021"
+```
+- file `config/plugins/http-auth.toml`
+
+```
+["core/http-auth"]
+enabled="receiver"
+# only check authentication for interfaces with following names
+interfaces=["feeder"]
+```
+
+- Test thử login http://45.124.93.82:12080/test-auth, nhập user/pass xem kết quả
+
+### config zone
+- File `config/pools.toml`
+
+```
+[[default]]
+address="0.0.0.0"
+name="relay.bizflycloud.vn"
+
+[[stg-vccorp]]
+address="0.0.0.0"
+name="stg.bizflycloud.vn"
+```
+
+- File `config/zones/stg-bizflycloud.toml`
+
+```
+[stg-bizflycloud]
+preferIPv6=false
+ignoreIPv6=true
+processes=4
+connections=10
+pool="stg-vccorp"
+senderDomains=["b2corp.click", "pikab.in","toandungmedia.vn","dinhha.online"]
 ```
