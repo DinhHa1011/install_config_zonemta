@@ -1,0 +1,7 @@
+- pool được sử dụng để chỉ một tập hợp các mail server có khả năng xử lý email
+- Khi một email được gửi đến một tên miền nào đó, zonemta sẽ kiểm tra các cấu hình của tên miền đó để xác định pool nào trong hệ thống sẽ được sử dụng để xử lý email này
+- pool có thể bao gồm một hoặc nhiều email server, tùy thuộc vào cấu hình của domain
+- Một số tính năng và lợi ích của việc sử dụng pool trong Zonemta:
+  - Khả năng phân tải tải cho các mail server trong pool, giúp tăng hiệu suất và độ tin cậy của hệ thống
+  - Khả năng tự động điều chỉnh số lượng server trong pool dựa trên tải đang xử lý, giúp tối ưu hóa sử dụng tài nguyên server
+  - Khả năng phân phối email đến các email server trong pool dựa trên các quy tắc được cấu hình, giúp tối ưu hóa quá trình xử lý email
