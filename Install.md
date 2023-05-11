@@ -254,5 +254,81 @@ echo "This is the body of the email" | mail  -a "From: mail gửi"  -s "This is 
 - Check log zonemta `journalctl -fu zonemta`
 
 ## Sending Zone
+- Có thể xác định bao nhiêu Sending Zone tùy thích. Mỗi Sending Zone có thể có vùng địa chỉ IP local riêng được sử dụng để gửi message được chỉ định cho Zone đó (địa chỉ IP không bi khoá, có thể gán cùng IP cho nhiều Zone hoặc nhiều lần cho một Zone). 
+### Định tuyến bằng tên zone
+- thêm allowRoutingHeaders trong file config/plugin/default-headers.toml: 
+```
+allowRoutingHeaders=["feeder"]
+```
+- thêm zone vào file config/pools.toml
+```
+[[stg-xsending]]
+address="0.0.0.0"
+name="xsendingzone.bizflycloud.vn"
+```
+- thêm và cấu hình file config/zones/stg-xsending.toml
+```
+[stg-xsending]
+preferIPv6=false
+ignoreIPv6=true
+processes=4
+connections=10
 
+pool="stg-xsending"
+[stg-xsending.routingHeaders]
+```
+- Gửi thử mail
+```
+echo "This is the body of the email" | mail -a "From: mail gửi" -a "X-Sending-Zone: stg-xsending"  -s "This is the subject line" mail nhận
+```
+- xem log zonemta, nếu thấy dòng dưới đây thì là đúng
+```
+info Sender/stg-xsending/2511098[10] id=kdjrm3hksqtstmrs 188051e2ae9220a575.001 CONNECTED domain=... mx=... src=xsendingzone.bizflycloud.vn[ip]
+```
+### Định tuyến bằng giá trị Header
+- thêm zone vào file config/pools.toml
+```
+[[stg-testH]]
+address="0.0.0.0"
+name="stgtestHeader.bizflycloud.vn"
+```
+- config file config/zones/routed
+```
+[routed]
+preferIPv6 = false
+ignoreIPv6 = true
+processes = 1
+connections = 5
+pool="stg-testH"
+ [routed.routingHeaders]
+  "x-user-id"="123"
+```
+- Gửi thử mail
+```
+echo "This is the body of the email" | mail -a "From: mail gửi" -a "x-user-id: 123"  -s "This is the subject line" mail nhận
+```
+- xem log zonemta
+```
+info Sender/stg-xsending/2511098[10] id=kdjrm3hksqtstmrs 188051e2ae9220a575.001 CONNECTED domain=... mx=... src=stgtestHeader.bizflycloud.vn[ip]
+```
+### Định tuyến bằng Domain gửi
+- thêm zone vào file config/pools.toml
+```
+[[stg-vccorp]]
+address="0.0.0.0"
+name="stg.bizflycloud.vn"
+```
+- config file config/zones/stg-bizflycloud.toml
+```
+[stg-bizflycloud]
+preferIPv6=false
+ignoreIPv6=true
+processes=4
+connections=10
 
+pool="stg-vccorp"
+senderDomains=["domain"]
+```
+- Gửi thử mail
+```
+echo "This is the body of the email" | mail -a "From: user@domain"  -s "This is the subject line" 
