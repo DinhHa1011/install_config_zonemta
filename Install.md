@@ -72,7 +72,7 @@ db.updateUser("zonemta", {roles: [{ role : "userAdmin", db : "zone-mta" }, {role
 ```
 exit
 
-mongo 45.124.93.82 -u zonemta  -p emJQ5bQqAw9SrV5r9cKQzTjd --authenticationDatabase zone-mta
+mongo ip -u zonemta  -p emJQ5bQqAw9SrV5r9cKQzTjd --authenticationDatabase zone-mta
 #### Redis
 - install redis
 ```
@@ -155,8 +155,8 @@ ident="zone-mta"
 [api]
 port=12080
 host="0.0.0.0"
-user="trangnth"
-pass="HaNoi2021"
+user="..."
+pass="..."
 ```
 - file `config/plugins/http-auth.toml`
 
@@ -167,7 +167,7 @@ enabled="receiver"
 interfaces=["feeder"]
 ```
 
-- Test thử login http://45.124.93.82:12080/test-auth, nhập user/pass xem kết quả
+- Test thử login http://ip:12080/test-auth, nhập user/pass xem kết quả
 
 ### config zone
 - File `config/pools.toml`
@@ -191,7 +191,7 @@ ignoreIPv6=true
 processes=4
 connections=10
 pool="stg-vccorp"
-senderDomains=["b2corp.click", "pikab.in","toandungmedia.vn","dinhha.online"]
+senderDomains=["domain"]
 ```
 
 ## Config postfix send email test to zonemta
@@ -224,13 +224,10 @@ mydestination = $myhostname, localhost.$mydomain, $mydomain
 ```
 postfix reload
 ```
-- relay tất cả các mail có from là trangnth1@toandungmedia.vn sang zonemta server 45.124.93.82:25 => sửa file `/etc/postfix/transport`
+- relay tất cả các mail có from là (email) sang zonemta server ip => sửa file `/etc/postfix/transport`
 
 ```
-trangnth1@toandungmedia.vn smtp:45.124.93.82:25
-hadt@pikab.in smtp:45.124.93.82:25
-hadinhthi@vccorp.vn smtp:45.124.93.82:25
-ah@dinhha.online smtp:45.124.93.82:25
+email smtp:ip:port
 ```
 - apply config
 
@@ -240,7 +237,7 @@ postmap /etc/postfix/transport
 - Sửa file `/etc/postfix/sasl_password` chứa ip:port, user:pass dùng để login vào zonemta
 
 ```
-45.124.93.82:25 trangnth:HaNoi2021
+ip user:pass
 ```
 - apply config 
 
@@ -250,10 +247,10 @@ postmap /etc/postfix/sasl_passwd
 - Gửi thử một email (from trùng với tên email đã được cấu hình trong file transport thì mới relay được)
 
 ```
-echo "This is the body of the email" | mail  -a "From: trangnth1@toandungmedia.vn"  -s "This is the subject line"  hadt@pikab.in
+echo "This is the body of the email" | mail  -a "From: mail gửi"  -s "This is the subject line"  mail nhận
 ```
 - Check log postfix trong /var/log/mail.log
-- email đã được relay sang zonemta `relay=45.124.93.82[45.124.93.82]:25` có `status=sent` là thành công
+- email đã được relay sang zonemta `relay=ip[ip]:port` có `status=sent` là thành công
 - Check log zonemta `journalctl -fu zonemta`
 
 ## Sending Zone
