@@ -332,3 +332,41 @@ senderDomains=["domain"]
 - Gửi thử mail
 ```
 echo "This is the body of the email" | mail -a "From: user@domain"  -s "This is the subject line" 
+```
+- xem log zonemta, nếu thấy dòng dưới đây thì là đúng
+```
+info Sender/stg-xsending/2511098[10] id=kdjrm3hksqtstmrs 188051e2ae9220a575.001 CONNECTED domain=... mx=... src=stg.bizflycloud.vn[ip]
+```
+### Định tuyến bằng Domain nhận
+- thêm zone vào file config/pools.toml
+```
+[[stg-test]]
+address="0.0.0.0"
+name="stgtest.bizflycloud.vn"
+```
+- config file config/zones/stgtest-bizflycloud.toml
+```
+[stgtest-bizflycloud]
+preferIPv6=false
+ignoreIPv6=true
+processes=4
+connections=10
+
+pool="stg-test"
+recipientDomains=["domain"]
+```
+- Gửi thử mail
+```
+echo "This is the body of the email" | mail -a "From: mail gửi"  -s "This is the subject line" user@domain
+```
+- xem log zonemta
+```
+info Sender/stg-xsending/2511098[10] id=kdjrm3hksqtstmrs 188051e2ae9220a575.001 CONNECTED domain=... mx=... src=stgtest.bizflycloud.vn[ip]
+```
+#### Thứ tự định tuyến như sau:
+- X-Sending-Zone
+- RoutingHeader
+- SenderDomain
+- RecipientDomain
+  - Nếu không phát hiện định tuyến, zone ‘default’ sẽ được sử dụng
+#### Note: Nếu cấu hình nhiều pool trong 1 file trong thư mục zones sẽ bị lỗi zonemta
