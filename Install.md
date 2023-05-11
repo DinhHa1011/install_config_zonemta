@@ -247,7 +247,7 @@ postmap /etc/postfix/transport
 ```
 postmap /etc/postfix/sasl_passwd
 ```
-- Gửi thử một email (form trùng với tên email đã được cấu hình trong file transport thì mới relay được)
+- Gửi thử một email (from trùng với tên email đã được cấu hình trong file transport thì mới relay được)
 
 ```
 echo "This is the body of the email" | mail  -a "From: trangnth1@toandungmedia.vn"  -s "This is the subject line"  hadt@pikab.in
@@ -255,5 +255,7 @@ echo "This is the body of the email" | mail  -a "From: trangnth1@toandungmedia.v
 - Check log postfix trong /var/log/mail.log
 - email đã được relay sang zonemta `relay=45.124.93.82[45.124.93.82]:25` có `status=sent` là thành công
 - Check log zonemta `journalctl -fu zonemta`
+
+## Sending Zone
 
 
